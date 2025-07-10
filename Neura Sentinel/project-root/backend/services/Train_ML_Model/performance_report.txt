@@ -1,0 +1,13 @@
+Model Accuracy: 0.9980
+
+Classification Report:
+              precision    recall  f1-score   support
+
+      BENIGN       1.00      1.00      1.00     87675
+         Bot       0.78      0.50      0.61       362
+        DDoS       1.00      1.00      1.00     25522
+    PortScan       1.00      1.00      1.00     31799
+
+    accuracy                           1.00    145358
+   macro avg       0.95      0.88      0.90    145358
+weighted avg       1.00      1.00      1.00    145358

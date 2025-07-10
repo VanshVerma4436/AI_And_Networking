@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  height: 100%;
+  background-color: #051937;
+}
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  min-height: 100%;
+  background: linear-gradient(135deg, #051937 0%, #062c54 100%);
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.cursor-none,
+.cursor-none * {
+  cursor: none !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #051937;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0582CA;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00A6FB;
+}
+
+/* Text selection */
+::selection {
+  background-color: rgba(0, 166, 251, 0.3);
+  color: #ffffff;
+}
+
+/* Interactive state animations */
+.interactive {
+  transition: all 0.3s ease;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+/* Glow effects */
+.glow {
+  box-shadow: 0 0 10px 0px rgba(0, 166, 251, 0.3);
+}
+
+.glow:hover {
+  box-shadow: 0 0 20px 5px rgba(0, 166, 251, 0.5);
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(5, 25, 55, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}

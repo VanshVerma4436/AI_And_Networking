@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature Importance - Hacker Matrix</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #000033, #000066);
+            color: #00f;
+            font-family: 'Roboto Mono', monospace;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            color: #00f;
+            text-shadow: 0 0 10px #00f, 0 0 20px #00f;
+            margin: 30px 0;
+            animation: glitch 1s linear infinite alternate;
+        }
+        canvas#featureChart {
+            max-width: 1200px;
+            height: 600px !important;
+            margin: 30px auto;
+            background: #f5f5f5;
+            padding: 30px;
+            border: 2px solid #00f;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 255, 0.5);
+        }
+        /* Glitch effect */
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        /* Matrix-like background animation */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+        .matrix-bg canvas {
+            width: 100%;
+            height: 100%;
+            border: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg">
+        <canvas id="matrixCanvas"></canvas>
+    </div>
+    <h1>Random Forest Feature Importance</h1>
+    <canvas id="featureChart"></canvas>
+    <script>
+        // Matrix background animation
+        const matrixCanvas = document.getElementById('matrixCanvas');
+        const matrixCtx = matrixCanvas.getContext('2d');
+        matrixCanvas.height = window.innerHeight;
+        matrixCanvas.width = window.innerWidth;
+        const chars = '01ハッカーABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 14;
+        const columns = matrixCanvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+        function drawMatrix() {
+            matrixCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+            matrixCtx.fillStyle = '#00f';
+            matrixCtx.font = fontSize + 'px "Roboto Mono"';
+            drops.forEach((y, i) => {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                const x = i * fontSize;
+                matrixCtx.fillText(text, x, y * fontSize);
+                if (y * fontSize > matrixCanvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(drawMatrix, 50);
+
+        // Load feature importances and create chart
+        fetch('feature_importances.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load feature_importances.json');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const labels = Object.keys(data);
+                const values = Object.values(data);
+                const ctx = document.getElementById('featureChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Feature Importance',
+                            data: values,
+                            backgroundColor: 'rgba(0, 0, 255, 0.6)',
+                            borderColor: '#00f',
+                            borderWidth: 2,
+                            hoverBackgroundColor: 'rgba(30, 144, 255, 0.8)',
+                            hoverBorderColor: '#1e90ff'
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Importance', color: '#00f', font: { family: 'Orbitron', size: 14 } },
+                                ticks: { color: '#00f' },
+                                grid: { color: 'rgba(0, 0, 255, 0.2)' }
+                            },
+                            x: {
+                                title: { display: true, text: 'Features', color: '#00f', font: { family: 'Orbitron', size: 14 } },
+                                ticks: { color: '#00f', font: { family: 'Roboto Mono' } },
+                                grid: { color: 'rgba(0, 0, 255, 0.2)' }
+                            }
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#00f', font: { family: 'Orbitron' } } },
+                            title: { display: true, text: 'Feature Importance in Random Forest Model', color: '#00f', font: { family: 'Orbitron', size: 18 } }
+                        },
+                        animation: {
+                            duration: 2000,
+                            easing: 'easeInOutQuart'
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error loading feature importances:', error);
+                alert('Error loading feature importances. Please ensure feature_importances.json exists in the same directory.');
+            });
+    </script>
+</body>
+</html>
